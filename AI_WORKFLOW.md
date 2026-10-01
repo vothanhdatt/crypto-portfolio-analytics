@@ -1,197 +1,132 @@
 # AI Workflow
 
-This file records selected examples of AI-assisted work. It will be expanded to 5-8 examples as implementation progresses.
+This document records eight representative uses of AI during the project. AI output was treated as a proposal: code and recommendations were reviewed against the assessment, repository boundaries, automated tests, security checks, and production behavior before acceptance.
 
-## Example 1 - Requirement analysis and calculation baseline
+## 1. Requirement analysis and benchmark definition
 
-### Goal and context
+**Category:** Requirement analysis
 
-Understand the assessment, identify the required product scope, and establish expected numeric results before implementation.
+**Prompt:**
 
-### Prompt
+> Phân tích yêu cầu này và liệt kê các bước để hoàn thành.
 
-> Phân tích yêu cầu này.
+The context included `assessment.pdf`, `trades.csv`, and `prices.csv`.
 
-Context included `assessment.pdf`, `trades.csv`, and `prices.csv`.
+**AI proposal:** The agent decomposed the work into data validation, a weighted-average calculation engine, an API boundary, dashboard, charts, transaction explorer, import workflow, testing, and production QA. It also calculated expected sample totals before implementation.
 
-### Agent response
+**Human review:** The proposed scope was checked against the assessment. Authentication, a database, blockchain integrations, and live price fetching were excluded because they were not required. Tests were moved ahead of UI work so the financial baseline existed first.
 
-The agent summarized functional and technical requirements, highlighted the weighted-average cost rules, inspected the supplied datasets, and produced expected portfolio totals for later regression testing.
+**Outcome:** Accepted as the implementation sequence. The sample expectations were later encoded in `portfolio.benchmark.test.js`, including 200 transactions, portfolio totals, per-asset quantities, and allocation reconciliation.
 
-### My review
+## 2. Project structure and Git workflow
 
-I reviewed the proposed execution order and asked for concrete implementation steps before authorizing project creation.
+**Category:** Architecture decision
 
-### Outcome
+**Prompt:**
 
-Accepted as the planning baseline. The expected totals will be encoded in automated tests when the portfolio calculation module is implemented.
+> Khởi tạo dự án với cấu trúc thư mục tương tự bot-farm BE và FE. Mỗi chức năng hoặc issue phải dùng branch riêng.
 
-## Example 2 - BE/FE project initialization
+**AI proposal:** The agent scaffolded separate Express and Next.js applications and mirrored the useful route/controller/service and feature-component organization of the reference projects.
 
-### Goal and context
+**Human review:** Reference business logic and secrets were not copied. The team conventions were recorded in `CONTRIBUTING.md`: English lowercase branch names, hyphen-separated descriptions, and conventional commit prefixes. Work proceeded on `feature/*`, `fix/*`, `refactor/*`, or `docs/*` branches rather than directly on `main` or `develop`.
 
-Initialize the repository using a directory structure similar to the supplied `bot-farm-be` and `bot-farm-fe` projects without copying unrelated business logic or secrets.
+**Outcome:** Accepted. The repository remains a lightweight two-application monorepo without an unnecessary workspace framework.
 
-### Prompt
+## 3. Calculator boundary was rejected and refactored
 
-> tiến hành khởi tạo dự án cấu trúc thư mục tương tự dự án bot-farm be & fe
+**Category:** Architecture correction — AI result rejected
 
-### Agent response
+**Prompt:**
 
-The agent inspected the reference projects, proposed separate `crypto-portfolio-be` and `crypto-portfolio-fe` applications, and scaffolded the backend module layers and frontend App Router structure.
+> Viết calculation engine tách thành module thuần, không phụ thuộc UI hay database.
 
-### My review
+**Initial AI result:** The first calculator was placed under `src/modules/portfolio` and raised the shared HTTP/application `AppError`. Although it had no UI or database dependency, its location and error type still coupled financial rules to the application layer.
 
-Pending final review after installation and startup verification.
+**Human review:** This did not satisfy the requested pure domain boundary. The result was rejected until the calculation code could accept plain data, return plain data, and report domain errors without knowing about Express or HTTP status codes.
 
-### Outcome
+**Correction:** Commit `2795a9e` moved the calculator from `src/modules/portfolio/portfolio.calculator.js` to `src/domain/portfolio/portfolio.calculator.js` and introduced `PortfolioCalculationError`. `portfolio.store.js` now translates domain errors to application `AppError` instances at the boundary.
 
-The scaffold is retained as the implementation foundation. Database, authentication, blockchain, and reference environment secrets were deliberately excluded because they are outside this assessment.
+**Outcome:** Accepted after refactoring. The domain engine depends only on `decimal.js` and its own error type; routes, controllers, storage, and frontend code remain outside it.
 
-## Example 3 - Weighted-average calculation and CSV validation
+## 4. PostCSS dependency recommendation was rejected
 
-### Goal and context
+**Category:** Dependency/security review — AI result rejected
 
-Implement the financial calculation engine and a complete, atomic CSV import boundary using the existing backend modules.
+**Prompt:**
 
-### Prompt
+> Kiểm tra dependency và production build trước khi hoàn tất.
 
-> triển khai calculation engine weighted-average và bộ validation CSV đầy đủ trong các module đã tạo
+**Initial AI result:** An AI-generated dependency recommendation suggested pinning an older PostCSS release. Review identified that recommendation as outdated and potentially exposed to known PostCSS security issues.
 
-The implementation had to follow the supplied BUY/SELL fee rules, reject short positions, preserve calculation precision, and keep the previous dataset unchanged when an import failed.
+**Human review:** The suggested version was not accepted. The installed dependency graph and lockfile were inspected instead of relying on the generated recommendation. The frontend now declares `postcss` as `^8.5.3`; the current lock resolves the direct dependency to `8.5.28`, while Next.js currently carries its own compatible nested release.
 
-### Agent response
+**Correction:** The maintained 8.5.x dependency line was retained, dependencies were resolved through the lockfile, and frontend lint, type checking, and the production build were rerun.
 
-The agent added a pure domain calculation module, CSV parsing and structured validation errors, an in-memory atomic portfolio store, import/reset endpoints, typed frontend contracts, and automated tests for the required edge cases and full sample dataset. The calculation engine uses plain inputs and outputs; HTTP error translation remains outside the domain layer.
+**Outcome:** Accepted only after local dependency resolution and build verification. This example is why version or vulnerability claims from AI must be verified against the actual manifest, lockfile, and package audit rather than copied directly.
 
-### My review
+## 5. Weighted-average engine, validation, and atomic import
 
-The result was checked with lint and automated tests. The sample portfolio was reconciled to the expected value, cost basis, realized P&L, unrealized P&L, total P&L, and fee totals. Dependency audit also identified an affected CSV parser release, which was upgraded to a patched major version and retested.
+**Category:** Implementation
 
-### Outcome
+**Prompt:**
 
-Accepted after the parser security upgrade and repeat test pass. Financial values remain unrounded decimal strings in the API so display rounding cannot alter calculation state.
+> Triển khai calculation engine weighted-average và bộ validation CSV đầy đủ. BUY fee vào cost basis, SELL fee trừ proceeds, cấm short position, và import lỗi không được thay dataset cũ.
 
-## Example 4 - Portfolio API boundary
+**AI proposal:** The agent implemented Decimal-based BUY/SELL processing, deterministic timestamp/trade-ID ordering, structured CSV errors, duplicate detection, required-column validation, supported value checks, price validation, and an in-memory store.
 
-### Goal and context
+**Human review:** The implementation was reviewed for fee handling and mutation order. The store was required to parse and calculate a candidate snapshot before assigning `currentTrades` or `snapshot`; this guarantees that parse, validation, missing-price, or short-position errors cannot replace the last valid dataset.
 
-Expose a minimal backend boundary so the UI receives validated and fully calculated portfolio data without duplicating financial logic.
+**Outcome:** Accepted. BUY fees are capitalized, SELL fees reduce net proceeds, full closes clear residual open basis, reopening is supported, and invalid imports are atomic.
 
-### Prompt
+## 6. Tests-first calculation and reconciliation debugging
 
-> Xây API/backend boundary
->
-> GET /api/portfolio
-> POST /api/import
-> POST /api/reset
+**Category:** Testing and debugging — AI test corrected
 
-The backend had to read sample data, validate imports, run the calculation engine, and return an explicit typed result.
+**Prompt:**
 
-### Agent response
+> Viết test trước khi làm UI và cho phép chạy toàn bộ test bằng một command.
 
-The agent added the three public routes, preserved the existing versioned routes for compatibility, introduced a runtime `PortfolioSnapshot` contract, updated the TypeScript frontend client, and added boundary tests for routes, sample loading, import, reset, missing files, and invalid responses.
+**AI proposal:** The test suite covered multiple BUY prices, BUY and SELL fees, partial and full closes, reopening, short rejection, duplicate/invalid rows, the full sample benchmark, reversed CSV order, missing prices, failed-import preservation, and allocation totals.
 
-### My review
+**Human review:** One generated reconciliation assertion compared long raw Decimal strings as if separately accumulated values must serialize identically. The calculation context can produce equivalent display currency totals with different insignificant tails depending on division history, so that test overstated the UI contract.
 
-The boundary was verified through automated tests and frontend type checking. The frontend API client was inspected to confirm it only requests calculated snapshots and contains no cost-basis or P&L formulas.
+**Correction:** Financial behavior and exact invariants remain exact where required, while dashboard reconciliation compares currency at its documented two-decimal display precision using Decimal `ROUND_HALF_UP`. Allocation is still checked to 20 decimal places and equals `1.00000000000000000000` for the sample.
 
-### Outcome
+**Outcome:** Accepted after the assertion was corrected to test the intended contract. `npm test` runs the entire backend suite from the repository root.
 
-Accepted with the short `/api` routes as the stable UI boundary. The backend remains the only owner of CSV parsing, validation, and portfolio calculation.
+## 7. API, dashboard, charts, and transaction explorer
 
-## Example 5 - Responsive portfolio dashboard
+**Category:** Implementation and boundary review
 
-### Goal and context
+**Prompt:**
 
-Build the first user-facing dashboard on top of the typed portfolio boundary while keeping every financial calculation in the backend.
+> Xây API/backend boundary, dashboard, biểu đồ và transaction explorer. Frontend không được tự tính số liệu tài chính; filter chỉ thay đổi bảng transaction.
 
-### Prompt
+**AI proposal:** The agent added `GET /api/portfolio`, `POST /api/import`, and `POST /api/reset`, then built six summary cards, holdings, allocation and P&L charts, and the filterable transaction table over the typed snapshot.
 
-> Xây dashboard
->
-> Sáu summary cards, holdings table, price timestamp, loading, error và empty state, responsive layout. Lãi/lỗ cần có dấu, label hoặc icon; màu sắc chỉ là tín hiệu bổ sung. Headline metrics phải reconcile với holdings table.
+**Human review:** The frontend client and components were inspected for duplicated cost-basis or P&L formulas. Chart number conversions were permitted only for SVG geometry and presentation. Transaction filter state was kept inside the explorer and never sent back to the portfolio calculator.
 
-### Agent response
+**Outcome:** Accepted. Headline values, holdings, and charts share one backend snapshot. Search, exchange/side/date filters, timestamp sorting, and pagination affect only visible transaction rows.
 
-The agent replaced the placeholder screen with six summary cards, a horizontally scrollable holdings table, a supplied-price timestamp, and dedicated loading, error/retry, and empty states. Gain and loss values use an explicit sign, directional icon, and text label in addition to color. Formatting is isolated from the API types, while every displayed cost and P&L value continues to come directly from one backend snapshot.
+## 8. Import, accessibility, and production QA
 
-### My review
+**Category:** Testing and debugging
 
-The implementation was checked at desktop and mobile breakpoints, including the loading skeleton and responsive table containment. The sample headline values were compared with the backend benchmark, and lint, production build, type checking, and the complete calculation/API test suite were rerun.
+**Prompt:**
 
-### Outcome
+> Hoàn thiện import UI, accessibility và production QA. Giữ dashboard cũ nếu import lỗi; kiểm tra keyboard, labels, table semantics, contrast, mobile overflow, console và build.
 
-Accepted as the portfolio overview foundation. The frontend performs presentation formatting only; it does not recalculate weighted-average cost, realized P&L, unrealized P&L, total P&L, or fees.
+**AI proposal:** The agent added drag-and-drop/file selection, file metadata, structured row errors, success/reset feedback, and live-region states, then exercised the production UI at desktop and mobile sizes.
 
-## Example 6 - Portfolio allocation and P&L charts
+**Human review:** QA found issues that a source-only review had missed, including a failed favicon request and text contrast near the threshold. Those results were not waived: the icon asset and color tokens were corrected, loading/error announcements were verified in the accessibility tree, and the browser console and production build were checked again.
 
-### Goal and context
+**Outcome:** Accepted after correction. Invalid CSV upload leaves all six current dashboard metrics unchanged; valid upload replaces the snapshot; reset restores the 200-row sample. Final keyboard, semantic table, contrast, overflow, live-region, console, and build evidence is recorded in `ACCESSIBILITY_QA.md`.
 
-Extend the portfolio overview with two responsive visualizations while retaining readable values and non-color accessibility cues.
+## Review principles used throughout
 
-### Prompt
-
-> Thêm biểu đồ
->
-> Donut hoặc bar chart allocation theo current value; grouped/stacked bar chart realized và unrealized P&L theo asset. Xử lý P&L âm, allocation bằng 0, tooltip format tiền, legend và label dễ đọc trên mobile.
-
-### Agent response
-
-The agent added a current-value allocation donut and a grouped realized/unrealized P&L bar chart using accessible SVG components without introducing a chart dependency. Allocation segments expose currency and percentage tooltips, including zero-allocation assets through the legend. The P&L chart uses a visible zero line with negative values extending below it. Hover, keyboard focus, and tap all reveal formatted currency details.
-
-### My review
-
-Both charts were checked with the sample portfolio at desktop and mobile widths. Mobile legends remain readable, the P&L plot scrolls horizontally instead of compressing labels, and every chart retains descriptive accessible labels. The production build, type check, lint, and complete backend test suite were rerun.
-
-### Outcome
-
-Accepted as dependency-free dashboard visualization. Chart calculations are limited to display geometry; all financial values still originate from the typed backend snapshot.
-
-## Example 7 - Transaction explorer
-
-### Goal and context
-
-Expose the complete trade history with useful exploration controls while guaranteeing that view filters cannot alter portfolio calculations.
-
-### Prompt
-
-> Xây transaction explorer
->
-> Hiển thị tất cả trường gốc từ CSV, gross value, fee nổi bật; hỗ trợ asset search, exchange, BUY/SELL, date range, timestamp sort và pagination. Filter chỉ thay đổi transaction table.
-
-### Agent response
-
-The agent added a client-side transaction explorer over the immutable transaction array from the calculated snapshot. It displays every source field plus backend-provided gross value, keeps the fee column visually prominent and sticky, and supports asset search, exchange and side filters, an inclusive date range, timestamp sorting, page-size selection, and pagination. Filter state is fully contained in the explorer component and never reaches the portfolio API or calculation engine.
-
-### My review
-
-The explorer was checked with the complete 200-row sample dataset on desktop and mobile. Browser-driven interaction verified the expected counts for BTC, Coinbase, SELL, and a March date range; ascending/descending timestamp order and second-page navigation were also checked. The six summary values were captured before and after all interactions and remained identical.
-
-### Outcome
-
-Accepted with view-only filtering. Gross value remains owned by the backend snapshot, while the frontend is responsible only for formatting, filtering, sorting, and pagination.
-
-## Example 8 - Atomic CSV import interface
-
-### Goal and context
-
-Complete the dataset workflow with accessible file selection, actionable validation feedback, and a safe path back to the supplied sample data.
-
-### Prompt
-
-> Hoàn thiện import UI
->
-> Drag-and-drop hoặc file picker; hiển thị tên file và số dòng; validation errors theo dòng; reset về sample data; success message; giữ nguyên dashboard nếu import thất bại.
-
-### Agent response
-
-The agent added a drag-and-drop and file-picker panel that previews filename, size, and logical CSV data-row count. Imports use the existing atomic backend boundary and display structured row, field, trade ID, message, and error-code details. A successful import swaps in the returned typed snapshot, while a failed import changes only the feedback panel. Reset restores the sample snapshot and clears the selected file.
-
-### My review
-
-Browser-driven QA uploaded an invalid two-row CSV and confirmed seven row-level errors while all six dashboard metrics remained unchanged. A valid two-row CSV then produced a success message and updated the complete dashboard. Reset restored the original 200 transactions and exact headline values. Desktop and mobile layouts, lint, type checking, production build, and the full backend suite were also checked.
-
-### Outcome
-
-Accepted as the final dataset control surface. Dashboard replacement occurs only after a successful backend response, preserving the last valid dataset for every failed import.
+- AI output is never accepted solely because it compiles or looks plausible.
+- Financial formulas are checked against hand-derived examples and fixed sample benchmarks.
+- Architectural requirements are verified from dependency direction, not only filenames.
+- Dependency advice is checked against the installed graph, lockfile, security tooling, and a clean build.
+- A failing or overly strict generated test is corrected to the product contract; production code is not distorted merely to satisfy a flawed assertion.
+- Browser and accessibility findings must be reproduced and rechecked after a fix.
