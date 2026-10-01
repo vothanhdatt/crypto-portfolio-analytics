@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
-    <div className="app-shell">
+    <div className="app-shell min-h-screen">
       <header className="topbar">
         <div>
           <p className="eyebrow">Portfolio intelligence</p>
@@ -14,4 +14,3 @@ export function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
-

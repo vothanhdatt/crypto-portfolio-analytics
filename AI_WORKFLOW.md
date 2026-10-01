@@ -48,3 +48,26 @@ Pending final review after installation and startup verification.
 
 The scaffold is retained as the implementation foundation. Database, authentication, blockchain, and reference environment secrets were deliberately excluded because they are outside this assessment.
 
+## Example 3 - Weighted-average calculation and CSV validation
+
+### Goal and context
+
+Implement the financial calculation engine and a complete, atomic CSV import boundary using the existing backend modules.
+
+### Prompt
+
+> triển khai calculation engine weighted-average và bộ validation CSV đầy đủ trong các module đã tạo
+
+The implementation had to follow the supplied BUY/SELL fee rules, reject short positions, preserve calculation precision, and keep the previous dataset unchanged when an import failed.
+
+### Agent response
+
+The agent added Decimal-based calculations, CSV parsing and structured validation errors, an in-memory atomic portfolio store, import/reset endpoints, typed frontend contracts, and automated tests for the required edge cases and full sample dataset.
+
+### My review
+
+The result was checked with lint and automated tests. The sample portfolio was reconciled to the expected value, cost basis, realized P&L, unrealized P&L, total P&L, and fee totals. Dependency audit also identified an affected CSV parser release, which was upgraded to a patched major version and retested.
+
+### Outcome
+
+Accepted after the parser security upgrade and repeat test pass. Financial values remain unrounded decimal strings in the API so display rounding cannot alter calculation state.
