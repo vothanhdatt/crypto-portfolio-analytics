@@ -35,6 +35,16 @@ npm run dev
 
 The API defaults to `http://localhost:1113`; the frontend defaults to `http://localhost:3002`.
 
+The frontend consumes the following calculated backend boundary:
+
+```text
+GET  /api/portfolio
+POST /api/import
+POST /api/reset
+```
+
+Portfolio cost basis and P&L are never calculated in the frontend.
+
 ## Testing
 
 After installing the backend dependencies, run the complete automated test suite from the repository root with one command:

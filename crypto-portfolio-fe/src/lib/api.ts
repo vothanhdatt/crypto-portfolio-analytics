@@ -35,19 +35,19 @@ const apiRequest = async <T>(path: string, init?: RequestInit): Promise<T> => {
 
 export const getHealth = () => apiRequest<HealthResponse>("/api/v1/health");
 
-export const getPortfolioOverview = () => apiRequest<PortfolioSnapshot>("/api/v1/portfolio/overview");
+export const getPortfolioOverview = () => apiRequest<PortfolioSnapshot>("/api/portfolio");
 
 export const importTrades = (file: File) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  return apiRequest<PortfolioSnapshot>("/api/v1/import/trades", {
+  return apiRequest<PortfolioSnapshot>("/api/import", {
     method: "POST",
     body: formData,
   });
 };
 
 export const resetTrades = () =>
-  apiRequest<PortfolioSnapshot>("/api/v1/import/reset", {
+  apiRequest<PortfolioSnapshot>("/api/reset", {
     method: "POST",
   });

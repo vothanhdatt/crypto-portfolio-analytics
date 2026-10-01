@@ -1,4 +1,5 @@
 const path = require('node:path');
+const { assertPortfolioSnapshot } = require('../../contracts/portfolio.contract');
 const AppError = require('../../utils/app-error.util');
 const { getPortfolioStore } = require('../portfolio/portfolio.store');
 const { REQUIRED_PRICE_COLUMNS, REQUIRED_TRADE_COLUMNS } = require('./import.constant');
@@ -29,10 +30,10 @@ const importTrades = async ({ file }) => {
     ]);
   }
 
-  return getPortfolioStore().importTrades(file.buffer);
+  return assertPortfolioSnapshot(getPortfolioStore().importTrades(file.buffer));
 };
 
-const resetTrades = async () => getPortfolioStore().reset();
+const resetTrades = async () => assertPortfolioSnapshot(getPortfolioStore().reset());
 
 module.exports = {
   describeImport,
