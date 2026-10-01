@@ -69,7 +69,8 @@ export function TransactionExplorer({ transactions }: { transactions: PortfolioT
         </div>
       </div>
 
-      <div className="transaction-filters" aria-label="Transaction filters">
+      <fieldset className="transaction-filters">
+        <legend className="sr-only">Transaction filters</legend>
         <label className="filter-field filter-search">
           <span>Asset</span>
           <input
@@ -141,10 +142,11 @@ export function TransactionExplorer({ transactions }: { transactions: PortfolioT
         <button className="secondary-button clear-filter-button" type="button" onClick={clearFilters} disabled={!hasFilters}>
           Clear filters
         </button>
-      </div>
+      </fieldset>
 
       <div className="transaction-table-scroll" role="region" aria-label="Filtered transactions" tabIndex={0}>
         <table className="transaction-table">
+          <caption className="sr-only">Filtered trade history with execution values and fees</caption>
           <thead>
             <tr>
               <th scope="col">Trade ID</th>

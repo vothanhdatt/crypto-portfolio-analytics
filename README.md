@@ -55,6 +55,8 @@ npm test
 
 The suite covers weighted-average BUYs, BUY and SELL fees, partial and full closes, reopened positions, short-position rejection, CSV validation, import atomicity, missing prices, allocation reconciliation, input-order independence, and the complete sample-data benchmark.
 
+The latest keyboard, semantic HTML, contrast, mobile overflow, live-region, console, and production-build checks are recorded in [ACCESSIBILITY_QA.md](./ACCESSIBILITY_QA.md).
+
 ## Status
 
 The project includes a Decimal-based weighted-average calculation engine, complete CSV validation, atomic trade import/reset, typed frontend API contracts, and benchmark tests against the supplied 200 transactions. The responsive portfolio dashboard now presents six reconciled summary metrics, valuation time, accessible gain/loss signals, current-value allocation, per-asset realized/unrealized P&L charts, the calculated holdings breakdown, a filterable transaction explorer, and drag-and-drop CSV import/reset controls with row-level validation feedback.

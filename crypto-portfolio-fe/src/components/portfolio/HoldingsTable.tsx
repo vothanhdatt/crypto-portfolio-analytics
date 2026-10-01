@@ -6,6 +6,7 @@ export function HoldingsTable({ positions }: { positions: PortfolioPosition[] })
   return (
     <div className="table-scroll" role="region" aria-label="Portfolio holdings" tabIndex={0}>
       <table className="holdings-table">
+        <caption className="sr-only">Current portfolio holdings and calculated performance by asset</caption>
         <thead>
           <tr>
             <th scope="col">Asset</th>
@@ -62,4 +63,3 @@ export function HoldingsTable({ positions }: { positions: PortfolioPosition[] })
     </div>
   );
 }
-

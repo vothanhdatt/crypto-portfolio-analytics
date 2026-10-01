@@ -1057,9 +1057,12 @@ button:focus-visible,
 
 .transaction-filters {
   display: grid;
+  min-inline-size: 0;
   grid-template-columns: minmax(180px, 1.4fr) repeat(2, minmax(140px, 0.9fr)) repeat(2, minmax(145px, 0.9fr)) auto;
   gap: 10px;
   align-items: end;
+  margin: 0;
+  border: 0;
   border-top: 1px solid var(--border);
   padding: 18px 26px;
   background: rgba(7, 16, 14, 0.36);
@@ -1101,7 +1104,7 @@ button:focus-visible,
 }
 
 .filter-field input::placeholder {
-  color: #71837d;
+  color: #7a8e87;
 }
 
 .secondary-button {
@@ -1223,7 +1226,7 @@ button:focus-visible,
 }
 
 .column-heading-stack small {
-  color: #71837d;
+  color: #7a8e87;
   font-size: 0.56rem;
   font-weight: 650;
   letter-spacing: 0;
