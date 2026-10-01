@@ -42,6 +42,8 @@ The calculation engine uses weighted-average cost per asset across exchanges:
 
 All arithmetic uses `decimal.js` with 40 significant digits. API values are returned as decimal strings without display rounding. Formatting and rounding belong to the presentation layer.
 
+The engine lives in `src/domain/portfolio` and is a pure domain module: it accepts plain trade and price objects, returns plain calculated objects, does not mutate its inputs, and has no dependency on Express, HTTP responses, UI code, filesystem access, stores, or databases. Domain errors are converted into HTTP-aware application errors only by the portfolio store boundary.
+
 ## Import behavior
 
 Imports validate the complete file before changing state. Validation covers required and duplicate columns, unique trade IDs, UTC timestamps, supported enum values, positive quantity and price, non-negative fees, CSV syntax, and chronological short-position prevention. Errors include row, field, code, and an actionable message.
