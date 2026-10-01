@@ -71,3 +71,31 @@ The result was checked with lint and automated tests. The sample portfolio was r
 ### Outcome
 
 Accepted after the parser security upgrade and repeat test pass. Financial values remain unrounded decimal strings in the API so display rounding cannot alter calculation state.
+
+## Example 4 - Portfolio API boundary
+
+### Goal and context
+
+Expose a minimal backend boundary so the UI receives validated and fully calculated portfolio data without duplicating financial logic.
+
+### Prompt
+
+> Xây API/backend boundary
+>
+> GET /api/portfolio
+> POST /api/import
+> POST /api/reset
+
+The backend had to read sample data, validate imports, run the calculation engine, and return an explicit typed result.
+
+### Agent response
+
+The agent added the three public routes, preserved the existing versioned routes for compatibility, introduced a runtime `PortfolioSnapshot` contract, updated the TypeScript frontend client, and added boundary tests for routes, sample loading, import, reset, missing files, and invalid responses.
+
+### My review
+
+The boundary was verified through automated tests and frontend type checking. The frontend API client was inspected to confirm it only requests calculated snapshots and contains no cost-basis or P&L formulas.
+
+### Outcome
+
+Accepted with the short `/api` routes as the stable UI boundary. The backend remains the only owner of CSV parsing, validation, and portfolio calculation.

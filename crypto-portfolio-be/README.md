@@ -17,17 +17,21 @@ npm run format
 - `GET /api/v1/portfolio/capabilities`
 - `GET /api/v1/import/requirements`
 
-## Portfolio endpoints
+## Public portfolio API
 
-- `GET /api/v1/portfolio/overview` returns summary totals, holdings, and ordered transactions.
-- `POST /api/v1/import/trades` accepts multipart form data with a CSV in the `file` field.
-- `POST /api/v1/import/reset` restores the supplied sample trade history.
+- `GET /api/portfolio` returns calculated summary totals, holdings, and ordered transactions.
+- `POST /api/import` accepts multipart form data with a CSV in the `file` field, validates the entire file, and returns the recalculated portfolio.
+- `POST /api/reset` restores the supplied sample trade history and returns the recalculated portfolio.
 
 Example import:
 
 ```bash
-curl -F "file=@data/trades.csv" http://localhost:1113/api/v1/import/trades
+curl -F "file=@data/trades.csv" http://localhost:1113/api/import
 ```
+
+The existing `/api/v1` endpoints remain available for backward compatibility. Financial calculations are performed only by the backend. The frontend consumes `PortfolioSnapshot` values and does not derive cost basis or P&L.
+
+Before a snapshot crosses the API boundary, the backend verifies its explicit runtime contract. All monetary and quantity values are transported as decimal strings to avoid JSON number precision loss; the frontend mirrors this contract with TypeScript types.
 
 ## Calculation rules
 

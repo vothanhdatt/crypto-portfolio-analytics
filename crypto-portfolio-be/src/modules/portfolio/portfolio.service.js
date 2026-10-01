@@ -1,4 +1,5 @@
 const { SUPPORTED_EXCHANGES, SUPPORTED_SIDES, SUPPORTED_SYMBOLS } = require('../../constants/portfolio.constant');
+const { assertPortfolioSnapshot } = require('../../contracts/portfolio.contract');
 const { getPortfolioStore } = require('./portfolio.store');
 
 const getCapabilities = async () => ({
@@ -10,7 +11,7 @@ const getCapabilities = async () => ({
   implementationStatus: 'ready',
 });
 
-const getOverview = async () => getPortfolioStore().getSnapshot();
+const getOverview = async () => assertPortfolioSnapshot(getPortfolioStore().getSnapshot());
 
 module.exports = {
   getCapabilities,
