@@ -245,6 +245,331 @@ button:focus-visible,
   line-height: 1.5;
 }
 
+.import-panel {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(430px, 1.28fr);
+  gap: 30px;
+  padding: 26px;
+  overflow: hidden;
+}
+
+.import-copy {
+  min-width: 0;
+}
+
+.import-copy h2 {
+  margin: 0;
+  font-size: 1.55rem;
+  letter-spacing: -0.035em;
+}
+
+.import-copy > p:not(.eyebrow) {
+  max-width: 420px;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.dataset-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 12px;
+  align-items: center;
+  margin-top: 22px;
+}
+
+.dataset-status strong {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.source-badge {
+  display: inline-flex;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 5px 8px;
+  font-size: 0.64rem;
+  font-weight: 850;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.source-sample {
+  color: var(--neutral);
+  background: rgba(196, 209, 204, 0.07);
+}
+
+.source-import {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.reset-data-button {
+  margin-top: 18px;
+}
+
+.import-workspace {
+  min-width: 0;
+}
+
+.file-dropzone {
+  position: relative;
+  display: grid;
+  min-height: 142px;
+  place-items: center;
+  align-content: center;
+  border: 1px dashed rgba(128, 228, 183, 0.35);
+  border-radius: 17px;
+  padding: 20px;
+  color: var(--text);
+  background: rgba(7, 16, 14, 0.48);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.file-dropzone:hover,
+.file-dropzone:focus-within,
+.file-dropzone.is-dragging {
+  border-color: var(--accent);
+  background: rgba(128, 228, 183, 0.07);
+}
+
+.file-dropzone.is-dragging {
+  transform: translateY(-2px);
+}
+
+.file-dropzone input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-dropzone input:disabled {
+  cursor: wait;
+}
+
+.dropzone-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 9px;
+  place-items: center;
+  border-radius: 11px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.dropzone-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.dropzone-copy {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.selected-file {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 10px 12px;
+  background: rgba(128, 228, 183, 0.035);
+}
+
+.file-type {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 0.62rem;
+  font-weight: 900;
+}
+
+.selected-file div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.selected-file strong {
+  overflow: hidden;
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selected-file div span {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.selected-file button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.selected-file button:hover:not(:disabled) {
+  color: var(--negative);
+  border-color: rgba(255, 170, 163, 0.35);
+}
+
+.import-button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.import-button:disabled {
+  color: #687872;
+  background: #1a2824;
+  cursor: not-allowed;
+}
+
+.import-message {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 9px;
+  align-items: center;
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 13px;
+  font-size: 0.78rem;
+}
+
+.import-message > span {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  grid-row: 1 / 3;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: 900;
+}
+
+.import-message small {
+  color: var(--muted);
+  font-size: 0.69rem;
+}
+
+.import-message-success {
+  border-color: rgba(128, 228, 183, 0.25);
+  background: var(--positive-soft);
+}
+
+.import-message-success > span {
+  color: #06100d;
+  background: var(--positive);
+}
+
+.import-message-error {
+  border-color: rgba(255, 170, 163, 0.28);
+  background: var(--negative-soft);
+}
+
+.import-message-error > span {
+  color: #210706;
+  background: var(--negative);
+}
+
+.validation-errors {
+  margin-top: 10px;
+  border: 1px solid rgba(255, 170, 163, 0.22);
+  border-radius: 13px;
+  overflow: hidden;
+}
+
+.validation-errors-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 13px;
+  color: var(--negative);
+  background: rgba(255, 170, 163, 0.07);
+  font-size: 0.76rem;
+}
+
+.validation-errors-heading span {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.validation-errors ol {
+  max-height: 230px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.validation-errors li {
+  display: grid;
+  grid-template-columns: minmax(105px, 0.35fr) minmax(180px, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  border-top: 1px solid rgba(255, 170, 163, 0.13);
+  padding: 11px 13px;
+}
+
+.error-location {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+}
+
+.error-location strong {
+  color: var(--negative);
+  font-size: 0.73rem;
+}
+
+.error-location span {
+  border-radius: 5px;
+  padding: 2px 5px;
+  color: var(--muted);
+  background: rgba(194, 226, 211, 0.07);
+  font-size: 0.62rem;
+}
+
+.validation-errors p {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.73rem;
+  line-height: 1.45;
+}
+
+.validation-errors code {
+  color: var(--muted);
+  font-size: 0.61rem;
+}
+
 .charts-grid {
   display: grid;
   min-width: 0;
@@ -1179,6 +1504,10 @@ button:focus-visible,
     grid-template-columns: minmax(220px, 0.8fr) minmax(240px, 1.2fr);
   }
 
+  .import-panel {
+    grid-template-columns: 1fr;
+  }
+
   .transaction-filters {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1229,6 +1558,24 @@ button:focus-visible,
 
   .summary-value {
     font-size: 2rem;
+  }
+
+  .import-panel {
+    gap: 22px;
+    padding: 20px 16px;
+  }
+
+  .file-dropzone {
+    min-height: 132px;
+  }
+
+  .reset-data-button {
+    width: 100%;
+  }
+
+  .validation-errors li {
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 
   .chart-panel {

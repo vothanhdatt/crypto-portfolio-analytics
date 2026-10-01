@@ -171,3 +171,27 @@ The explorer was checked with the complete 200-row sample dataset on desktop and
 ### Outcome
 
 Accepted with view-only filtering. Gross value remains owned by the backend snapshot, while the frontend is responsible only for formatting, filtering, sorting, and pagination.
+
+## Example 8 - Atomic CSV import interface
+
+### Goal and context
+
+Complete the dataset workflow with accessible file selection, actionable validation feedback, and a safe path back to the supplied sample data.
+
+### Prompt
+
+> Hoàn thiện import UI
+>
+> Drag-and-drop hoặc file picker; hiển thị tên file và số dòng; validation errors theo dòng; reset về sample data; success message; giữ nguyên dashboard nếu import thất bại.
+
+### Agent response
+
+The agent added a drag-and-drop and file-picker panel that previews filename, size, and logical CSV data-row count. Imports use the existing atomic backend boundary and display structured row, field, trade ID, message, and error-code details. A successful import swaps in the returned typed snapshot, while a failed import changes only the feedback panel. Reset restores the sample snapshot and clears the selected file.
+
+### My review
+
+Browser-driven QA uploaded an invalid two-row CSV and confirmed seven row-level errors while all six dashboard metrics remained unchanged. A valid two-row CSV then produced a success message and updated the complete dashboard. Reset restored the original 200 transactions and exact headline values. Desktop and mobile layouts, lint, type checking, production build, and the full backend suite were also checked.
+
+### Outcome
+
+Accepted as the final dataset control surface. Dashboard replacement occurs only after a successful backend response, preserving the last valid dataset for every failed import.
