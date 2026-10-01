@@ -19,7 +19,14 @@ const initialState: DashboardState = { status: "loading", data: null, message: n
 
 function LoadingDashboard() {
   return (
-    <div className="dashboard-content" aria-busy="true" aria-label="Loading portfolio">
+    <div
+      className="dashboard-content"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-busy="true"
+      aria-label="Loading portfolio"
+    >
       <div className="dashboard-heading skeleton-heading">
         <span className="skeleton skeleton-short" />
         <span className="skeleton skeleton-title" />

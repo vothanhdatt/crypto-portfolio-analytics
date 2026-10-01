@@ -139,7 +139,7 @@ export function ImportPanel({
   };
 
   return (
-    <section className="panel import-panel" aria-labelledby="import-title">
+    <section className="panel import-panel" aria-labelledby="import-title" aria-busy={isBusy}>
       <div className="import-copy">
         <p className="eyebrow">Dataset controls</p>
         <h2 id="import-title">Import trade history</h2>
@@ -221,7 +221,7 @@ export function ImportPanel({
         )}
 
         {errors.length > 0 && (
-          <div className="validation-errors" aria-labelledby="validation-errors-title">
+          <div className="validation-errors" role="region" aria-live="polite" aria-labelledby="validation-errors-title">
             <div className="validation-errors-heading">
               <strong id="validation-errors-title">Validation errors</strong>
               <span>{errors.length} {errors.length === 1 ? "issue" : "issues"}</span>
