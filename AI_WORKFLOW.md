@@ -147,3 +147,27 @@ Both charts were checked with the sample portfolio at desktop and mobile widths.
 ### Outcome
 
 Accepted as dependency-free dashboard visualization. Chart calculations are limited to display geometry; all financial values still originate from the typed backend snapshot.
+
+## Example 7 - Transaction explorer
+
+### Goal and context
+
+Expose the complete trade history with useful exploration controls while guaranteeing that view filters cannot alter portfolio calculations.
+
+### Prompt
+
+> Xây transaction explorer
+>
+> Hiển thị tất cả trường gốc từ CSV, gross value, fee nổi bật; hỗ trợ asset search, exchange, BUY/SELL, date range, timestamp sort và pagination. Filter chỉ thay đổi transaction table.
+
+### Agent response
+
+The agent added a client-side transaction explorer over the immutable transaction array from the calculated snapshot. It displays every source field plus backend-provided gross value, keeps the fee column visually prominent and sticky, and supports asset search, exchange and side filters, an inclusive date range, timestamp sorting, page-size selection, and pagination. Filter state is fully contained in the explorer component and never reaches the portfolio API or calculation engine.
+
+### My review
+
+The explorer was checked with the complete 200-row sample dataset on desktop and mobile. Browser-driven interaction verified the expected counts for BTC, Coinbase, SELL, and a March date range; ascending/descending timestamp order and second-page navigation were also checked. The six summary values were captured before and after all interactions and remained identical.
+
+### Outcome
+
+Accepted with view-only filtering. Gross value remains owned by the backend snapshot, while the frontend is responsible only for formatting, filtering, sorting, and pagination.
