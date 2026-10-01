@@ -1,0 +1,26 @@
+{
+  "name": "crypto-portfolio-service",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "test": "node --test",
+    "lint": "eslint \"src/**/*.js\" \"test/**/*.js\" index.js",
+    "format": "prettier --write \"src/**/*.js\" \"test/**/*.js\" index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.5.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,17 @@
+import type { ReactNode } from "react";
+
+export function AppShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="app-shell">
+      <header className="topbar">
+        <div>
+          <p className="eyebrow">Portfolio intelligence</p>
+          <h1>Crypto Portfolio Analytics</h1>
+        </div>
+        <span className="status-chip">Project initialized</span>
+      </header>
+      <main>{children}</main>
+    </div>
+  );
+}
+
