@@ -99,3 +99,27 @@ The boundary was verified through automated tests and frontend type checking. Th
 ### Outcome
 
 Accepted with the short `/api` routes as the stable UI boundary. The backend remains the only owner of CSV parsing, validation, and portfolio calculation.
+
+## Example 5 - Responsive portfolio dashboard
+
+### Goal and context
+
+Build the first user-facing dashboard on top of the typed portfolio boundary while keeping every financial calculation in the backend.
+
+### Prompt
+
+> Xây dashboard
+>
+> Sáu summary cards, holdings table, price timestamp, loading, error và empty state, responsive layout. Lãi/lỗ cần có dấu, label hoặc icon; màu sắc chỉ là tín hiệu bổ sung. Headline metrics phải reconcile với holdings table.
+
+### Agent response
+
+The agent replaced the placeholder screen with six summary cards, a horizontally scrollable holdings table, a supplied-price timestamp, and dedicated loading, error/retry, and empty states. Gain and loss values use an explicit sign, directional icon, and text label in addition to color. Formatting is isolated from the API types, while every displayed cost and P&L value continues to come directly from one backend snapshot.
+
+### My review
+
+The implementation was checked at desktop and mobile breakpoints, including the loading skeleton and responsive table containment. The sample headline values were compared with the backend benchmark, and lint, production build, type checking, and the complete calculation/API test suite were rerun.
+
+### Outcome
+
+Accepted as the portfolio overview foundation. The frontend performs presentation formatting only; it does not recalculate weighted-average cost, realized P&L, unrealized P&L, total P&L, or fees.

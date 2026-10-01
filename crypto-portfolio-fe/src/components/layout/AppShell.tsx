@@ -8,7 +8,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           <p className="eyebrow">Portfolio intelligence</p>
           <h1>Crypto Portfolio Analytics</h1>
         </div>
-        <span className="status-chip">Project initialized</span>
+        <span className="status-chip">
+          <span className="status-dot" aria-hidden="true" />
+          Weighted-average view
+        </span>
       </header>
       <main>{children}</main>
     </div>

@@ -35,7 +35,8 @@ const apiRequest = async <T>(path: string, init?: RequestInit): Promise<T> => {
 
 export const getHealth = () => apiRequest<HealthResponse>("/api/v1/health");
 
-export const getPortfolioOverview = () => apiRequest<PortfolioSnapshot>("/api/portfolio");
+export const getPortfolioOverview = (signal?: AbortSignal) =>
+  apiRequest<PortfolioSnapshot>("/api/portfolio", { signal });
 
 export const importTrades = (file: File) => {
   const formData = new FormData();
