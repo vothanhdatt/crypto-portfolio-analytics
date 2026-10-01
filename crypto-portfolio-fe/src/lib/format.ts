@@ -15,6 +15,14 @@ const currencyFormatter = (maximumFractionDigits: number) =>
 
 export const formatCurrency = (value: string) => currencyFormatter(2).format(toDisplayNumber(value));
 
+export const formatCompactCurrency = (value: number) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value);
+
 export const formatPrice = (value: string | null) => {
   if (value === null) return "Unavailable";
   const number = toDisplayNumber(value);
@@ -67,4 +75,3 @@ export const formatPriceTimestamp = (value: string | null) => {
     timeZoneName: "short",
   }).format(new Date(value))}`;
 };
-
