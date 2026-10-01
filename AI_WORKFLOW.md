@@ -123,3 +123,27 @@ The implementation was checked at desktop and mobile breakpoints, including the 
 ### Outcome
 
 Accepted as the portfolio overview foundation. The frontend performs presentation formatting only; it does not recalculate weighted-average cost, realized P&L, unrealized P&L, total P&L, or fees.
+
+## Example 6 - Portfolio allocation and P&L charts
+
+### Goal and context
+
+Extend the portfolio overview with two responsive visualizations while retaining readable values and non-color accessibility cues.
+
+### Prompt
+
+> Thêm biểu đồ
+>
+> Donut hoặc bar chart allocation theo current value; grouped/stacked bar chart realized và unrealized P&L theo asset. Xử lý P&L âm, allocation bằng 0, tooltip format tiền, legend và label dễ đọc trên mobile.
+
+### Agent response
+
+The agent added a current-value allocation donut and a grouped realized/unrealized P&L bar chart using accessible SVG components without introducing a chart dependency. Allocation segments expose currency and percentage tooltips, including zero-allocation assets through the legend. The P&L chart uses a visible zero line with negative values extending below it. Hover, keyboard focus, and tap all reveal formatted currency details.
+
+### My review
+
+Both charts were checked with the sample portfolio at desktop and mobile widths. Mobile legends remain readable, the P&L plot scrolls horizontally instead of compressing labels, and every chart retains descriptive accessible labels. The production build, type check, lint, and complete backend test suite were rerun.
+
+### Outcome
+
+Accepted as dependency-free dashboard visualization. Chart calculations are limited to display geometry; all financial values still originate from the typed backend snapshot.

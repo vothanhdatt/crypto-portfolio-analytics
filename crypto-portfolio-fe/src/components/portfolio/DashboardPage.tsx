@@ -5,6 +5,7 @@ import { getPortfolioOverview } from "@/lib/api";
 import { formatPriceTimestamp } from "@/lib/format";
 import type { PortfolioSnapshot } from "@/types/portfolio";
 import { HoldingsTable } from "./HoldingsTable";
+import { PortfolioCharts } from "./PortfolioCharts";
 import { SummaryCard } from "./SummaryCard";
 
 type DashboardState =
@@ -28,6 +29,15 @@ function LoadingDashboard() {
             <span className="skeleton skeleton-short" />
             <span className="skeleton skeleton-value" />
             <span className="skeleton skeleton-copy" />
+          </div>
+        ))}
+      </div>
+      <div className="charts-grid">
+        {Array.from({ length: 2 }, (_, index) => (
+          <div className="panel skeleton-chart" key={index}>
+            <span className="skeleton skeleton-short" />
+            <span className="skeleton skeleton-title" />
+            <span className="skeleton skeleton-chart-area" />
           </div>
         ))}
       </div>
@@ -173,6 +183,8 @@ export function DashboardPage() {
           <SummaryCard key={card.label} {...card} />
         ))}
       </section>
+
+      <PortfolioCharts positions={portfolio.positions} />
 
       <section className="panel holdings-panel" aria-labelledby="holdings-title">
         <div className="panel-heading">
