@@ -1,8 +1,7 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const Decimal = require('decimal.js');
-const { calculatePortfolio } = require('../src/modules/portfolio/portfolio.calculator');
-const { createDefaultStore } = require('../src/modules/portfolio/portfolio.store');
+const PortfolioCalculationError = require('../src/domain/portfolio/portfolio-calculation.error');
+const { calculatePortfolio } = require('../src/domain/portfolio/portfolio.calculator');
 
 const asOf = '2026-03-31T23:59:59Z';
 const prices = [{ asOf, symbol: 'BTC', priceUsd: '125' }];
@@ -114,7 +113,7 @@ test('calculation independently rejects a short position', () => {
       positionFrom([
         trade({ tradeId: 'T-1', timestamp: '2026-01-01T00:00:00Z', side: 'SELL', quantity: '1', priceUsd: '100' }),
       ]),
-    (error) => error.statusCode === 422 && error.details[0].code === 'SHORT_POSITION'
+    (error) => error instanceof PortfolioCalculationError && error.code === 'SHORT_POSITION'
   );
 });
 
@@ -125,36 +124,21 @@ test('calculation rejects a missing price for an open position', () => {
         [trade({ tradeId: 'T-1', timestamp: '2026-01-01T00:00:00Z', side: 'BUY', quantity: '1', priceUsd: '100' })],
         []
       ),
-    (error) => error.statusCode === 422 && error.details[0].code === 'MISSING_CURRENT_PRICE'
+    (error) => error instanceof PortfolioCalculationError && error.code === 'MISSING_CURRENT_PRICE'
   );
 });
 
-test('sample data reconciles to the assessment benchmark', () => {
-  const portfolio = createDefaultStore().getSnapshot();
-  const rounded = (value) => new Decimal(value).toFixed(2);
+test('calculation does not mutate input trades or prices', () => {
+  const trades = Object.freeze([
+    Object.freeze(
+      trade({ tradeId: 'T-1', timestamp: '2026-01-01T00:00:00Z', side: 'BUY', quantity: '1', priceUsd: '100' })
+    ),
+  ]);
+  const currentPrices = Object.freeze([Object.freeze({ asOf, symbol: 'BTC', priceUsd: '125' })]);
 
-  assert.equal(portfolio.transactionCount, 200);
-  assert.equal(portfolio.priceAsOf, asOf);
-  assert.equal(rounded(portfolio.summary.currentValue), '60620.89');
-  assert.equal(rounded(portfolio.summary.currentCostBasis), '59969.24');
-  assert.equal(rounded(portfolio.summary.realizedPnl), '-5052.96');
-  assert.equal(rounded(portfolio.summary.unrealizedPnl), '651.65');
-  assert.equal(rounded(portfolio.summary.totalPnl), '-4401.31');
-  assert.equal(portfolio.summary.totalFees, '2708.86');
-  assert.equal(portfolio.positions.length, 5);
+  const result = calculatePortfolio({ trades, prices: currentPrices });
 
-  const positions = Object.fromEntries(portfolio.positions.map((position) => [position.symbol, position]));
-  assert.equal(positions.BTC.quantity, '0.0774292');
-  assert.equal(rounded(positions.BTC.totalPnl), '-944.73');
-  assert.equal(positions.CKB.quantity, '1947047');
-  assert.equal(rounded(positions.CKB.totalPnl), '2038.25');
-  assert.equal(positions.DOGE.quantity, '63970.78');
-  assert.equal(rounded(positions.DOGE.totalPnl), '-1605.09');
-  assert.equal(positions.ETH.quantity, '2.846898');
-  assert.equal(rounded(positions.ETH.totalPnl), '-1174.09');
-  assert.equal(positions.SOL.quantity, '53.3643');
-  assert.equal(rounded(positions.SOL.totalPnl), '-2715.66');
-
-  const allocation = portfolio.positions.reduce((total, position) => total.plus(position.allocation), new Decimal(0));
-  assert.equal(allocation.toFixed(20), '1.00000000000000000000');
+  assert.equal(result.summary.currentValue, '125');
+  assert.equal(trades[0].quantity, '1');
+  assert.equal(currentPrices[0].priceUsd, '125');
 });

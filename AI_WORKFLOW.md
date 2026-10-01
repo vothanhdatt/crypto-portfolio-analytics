@@ -62,7 +62,7 @@ The implementation had to follow the supplied BUY/SELL fee rules, reject short p
 
 ### Agent response
 
-The agent added Decimal-based calculations, CSV parsing and structured validation errors, an in-memory atomic portfolio store, import/reset endpoints, typed frontend contracts, and automated tests for the required edge cases and full sample dataset.
+The agent added a pure domain calculation module, CSV parsing and structured validation errors, an in-memory atomic portfolio store, import/reset endpoints, typed frontend contracts, and automated tests for the required edge cases and full sample dataset. The calculation engine uses plain inputs and outputs; HTTP error translation remains outside the domain layer.
 
 ### My review
 

@@ -31,3 +31,18 @@ test('valid import replaces the dataset and reset restores sample trades', () =>
   assert.equal(resetSnapshot.source, 'sample');
   assert.equal(resetSnapshot.summary.currentCostBasis, '100');
 });
+
+test('store translates domain calculation errors into application errors', () => {
+  const pricesWithoutBtc = ['as_of,symbol,price_usd', '2026-03-31T23:59:59Z,ETH,125'].join('\n');
+
+  assert.throws(
+    () => new PortfolioStore({ tradesCsv: initialTrades, pricesCsv: pricesWithoutBtc }),
+    (error) => {
+      assert.equal(error.name, 'AppError');
+      assert.equal(error.statusCode, 422);
+      assert.equal(error.details[0].code, 'MISSING_CURRENT_PRICE');
+      assert.equal(error.details[0].symbol, 'BTC');
+      return true;
+    }
+  );
+});
