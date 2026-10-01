@@ -1,9 +1,10 @@
 const multer = require('multer');
+const { MAX_CSV_FILE_SIZE_BYTES } = require('../modules/import/import.constant');
 
 const uploadCsv = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024,
+    fileSize: MAX_CSV_FILE_SIZE_BYTES,
     files: 1,
   },
 });

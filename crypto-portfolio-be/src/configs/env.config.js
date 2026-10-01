@@ -21,7 +21,6 @@ module.exports = {
   },
   server: {
     clientUrls: splitList(process.env.CLIENT_URLS || 'http://localhost:3002'),
-    requestBodyLimit: process.env.REQUEST_BODY_LIMIT || '5mb',
+    requestBodyLimit: process.env.REQUEST_BODY_LIMIT || '4mb',
   },
 };
-

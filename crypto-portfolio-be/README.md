@@ -52,4 +52,18 @@ The engine lives in `src/domain/portfolio` and is a pure domain module: it accep
 
 Imports validate the complete file before changing state. Validation covers required and duplicate columns, unique trade IDs, UTC timestamps, supported enum values, positive quantity and price, non-negative fees, CSV syntax, and chronological short-position prevention. Errors include row, field, code, and an actionable message.
 
-The current implementation stores the active dataset in process memory. A restart restores the supplied sample data. This keeps the assessment deployment stateless; durable or per-user persistence can be added later without changing the calculation engine.
+The current implementation stores the active dataset in process memory. A restart restores the supplied sample data. On Vercel, state is scoped to an individual function instance and is not guaranteed across cold starts or concurrent instances. The import response still contains the complete calculated snapshot used by the current browser session; durable or per-user persistence can be added later without changing the calculation engine.
+
+CSV files are limited to 4 MB so multipart requests remain below Vercel Functions' 4.5 MB payload limit.
+
+## Vercel
+
+Create a Vercel Project with this directory as its Root Directory and select the Express preset. The root `index.js` exports the Express application for Vercel while continuing to open port 1113 when run directly. `vercel.json` includes `data/**` in the function bundle.
+
+Production environment variables:
+
+```env
+APP_MODE=production
+CLIENT_URLS=https://<frontend-project>.vercel.app
+REQUEST_BODY_LIMIT=4mb
+```
