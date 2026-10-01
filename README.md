@@ -37,4 +37,4 @@ The API defaults to `http://localhost:1113`; the frontend defaults to `http://lo
 
 ## Status
 
-The project skeleton, health endpoint, shared response contract, frontend shell, and initial documentation are in place. Portfolio calculation and CSV import are the next implementation milestones.
+The project includes a Decimal-based weighted-average calculation engine, complete CSV validation, atomic trade import/reset, typed frontend API contracts, and benchmark tests against the supplied 200 transactions. Dashboard visualization and the transaction explorer are the next implementation milestones.
