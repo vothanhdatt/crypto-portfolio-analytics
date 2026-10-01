@@ -6,6 +6,7 @@ const { assertPortfolioSnapshot } = require('../src/contracts/portfolio.contract
 const importService = require('../src/modules/import/import.service');
 const portfolioService = require('../src/modules/portfolio/portfolio.service');
 const portfolioApiRoutes = require('../src/routes/portfolio-api.route');
+const vercelConfig = require('../vercel.json');
 
 const sampleTradesPath = path.resolve(__dirname, '../data/trades.csv');
 
@@ -17,6 +18,18 @@ test('public API boundary exposes the required routes', () => {
     );
 
   assert.deepEqual(routes, ['GET /portfolio', 'POST /import', 'POST /reset']);
+});
+
+test('import capabilities expose the Vercel-safe CSV upload limit', async () => {
+  const capabilities = await importService.describeImport();
+
+  assert.equal(capabilities.maxFileSizeBytes, 4 * 1024 * 1024);
+  assert.equal(capabilities.atomic, true);
+});
+
+test('Vercel entrypoint exports Express and bundles the sample data', () => {
+  assert.equal(require('../index'), require('../src/app'));
+  assert.equal(vercelConfig.functions['index.js'].includeFiles, 'data/**');
 });
 
 test('portfolio service reads sample data and returns the response contract', async () => {

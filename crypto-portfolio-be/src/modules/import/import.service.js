@@ -2,12 +2,16 @@ const path = require('node:path');
 const { assertPortfolioSnapshot } = require('../../contracts/portfolio.contract');
 const AppError = require('../../utils/app-error.util');
 const { getPortfolioStore } = require('../portfolio/portfolio.store');
-const { REQUIRED_PRICE_COLUMNS, REQUIRED_TRADE_COLUMNS } = require('./import.constant');
+const {
+  MAX_CSV_FILE_SIZE_BYTES,
+  REQUIRED_PRICE_COLUMNS,
+  REQUIRED_TRADE_COLUMNS,
+} = require('./import.constant');
 
 const describeImport = async () => ({
   requiredTradeColumns: REQUIRED_TRADE_COLUMNS,
   requiredPriceColumns: REQUIRED_PRICE_COLUMNS,
-  maxFileSizeBytes: 5 * 1024 * 1024,
+  maxFileSizeBytes: MAX_CSV_FILE_SIZE_BYTES,
   atomic: true,
   implementationStatus: 'ready',
 });

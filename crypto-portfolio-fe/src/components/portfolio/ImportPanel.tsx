@@ -6,6 +6,8 @@ import type { ApiErrorDetail } from "@/types/api";
 import type { PortfolioSnapshot } from "@/types/portfolio";
 
 type ImportStatus = "idle" | "reading" | "importing" | "resetting" | "success" | "error";
+const MAX_CSV_FILE_SIZE_BYTES = 4 * 1024 * 1024;
+const BLOCKING_FILE_ERROR_CODES = new Set(["INVALID_FILE_TYPE", "FILE_TOO_LARGE", "FILE_READ_FAILED"]);
 
 const countCsvDataRows = (contents: string) => {
   let inQuotes = false;
@@ -78,6 +80,20 @@ export function ImportPanel({
       setStatus("error");
       setMessage("Only CSV files can be imported.");
       setErrors([{ field: "file", code: "INVALID_FILE_TYPE", message: "Choose a file with the .csv extension." }]);
+      return;
+    }
+
+    if (nextFile.size > MAX_CSV_FILE_SIZE_BYTES) {
+      setStatus("error");
+      setMessage("The selected CSV file is too large.");
+      setErrors([
+        {
+          field: "file",
+          code: "FILE_TOO_LARGE",
+          message: "Choose a CSV file that is 4 MB or smaller.",
+          value: nextFile.size,
+        },
+      ]);
       return;
     }
 
@@ -181,7 +197,7 @@ export function ImportPanel({
           />
           <span className="dropzone-icon" aria-hidden="true">⇧</span>
           <span className="dropzone-title">Drop a trades CSV here</span>
-          <span className="dropzone-copy">or choose a file · CSV only · maximum 5 MB</span>
+          <span className="dropzone-copy">or choose a file · CSV only · maximum 4 MB</span>
         </label>
 
         {file && (
@@ -208,7 +224,14 @@ export function ImportPanel({
           </div>
         )}
 
-        <button className="primary-button import-button" type="button" onClick={handleImport} disabled={!file || isBusy || status === "error" && errors[0]?.code === "INVALID_FILE_TYPE"}>
+        <button
+          className="primary-button import-button"
+          type="button"
+          onClick={handleImport}
+          disabled={
+            !file || isBusy || (status === "error" && BLOCKING_FILE_ERROR_CODES.has(errors[0]?.code ?? ""))
+          }
+        >
           {status === "importing" ? "Validating and importing…" : "Import transactions"}
         </button>
 

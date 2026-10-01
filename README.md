@@ -47,7 +47,7 @@ Open `http://localhost:3002`. The API is available at `http://localhost:1113`. O
 | --- | --- | --- | --- |
 | `PORT` | `1113` | No | HTTP port for the Express API. |
 | `CLIENT_URLS` | `http://localhost:3002` | No | Comma-separated CORS allowlist. Values must match frontend origins exactly. |
-| `REQUEST_BODY_LIMIT` | `5mb` | No | Express request-body limit. CSV upload middleware independently accepts one file up to 5 MB. |
+| `REQUEST_BODY_LIMIT` | `4mb` | No | Express request-body limit. CSV upload middleware independently accepts one file up to 4 MB so multipart requests remain below Vercel's 4.5 MB payload limit. |
 | `APP_MODE` | `development` | No | Runtime mode exposed to backend configuration. |
 
 ### Frontend: `crypto-portfolio-fe/.env.local`
@@ -185,7 +185,7 @@ An open position without a current price is rejected instead of being silently v
 - Weighted-average basis is maintained per asset across exchanges, not as separate exchange lots.
 - The price CSV is a single valuation snapshot. All rows must share its `as_of` timestamp, and every open asset needs one price.
 - The import endpoint replaces trades only. It continues to use the committed sample prices for valuation.
-- The active dataset is process-local and in memory. It is shared by connected clients and resets when the backend restarts.
+- The active dataset is process-local and in memory. On a traditional single process it is shared by connected clients and resets when the backend restarts. On Vercel it is ephemeral per function instance, so an import updates the current browser from the returned snapshot but is not guaranteed to survive a reload or a request handled by another instance.
 - Atomic import favors correctness over partial acceptance: one invalid row rejects the whole file.
 - Client-side transaction filtering is simple and responsive for the 200-row sample, but is not intended for very large datasets.
 - Authentication, user accounts, database persistence, tax-lot methods, and live market feeds are intentionally outside the assessment scope.
@@ -200,7 +200,56 @@ An open position without a current price is rejected instead of being silently v
 | Local frontend | `http://localhost:3002` |
 | Local API | `http://localhost:1113` |
 
-Before deployment, set the frontend and API URLs for the target environment and configure `CLIENT_URLS` with the exact public frontend origin.
+The repository is prepared for two Vercel Projects connected to the same Git repository.
+
+### 1. Deploy the backend
+
+Create a Vercel Project with:
+
+```text
+Root Directory: crypto-portfolio-be
+Framework Preset: Express
+```
+
+Set production environment variables:
+
+```env
+APP_MODE=production
+CLIENT_URLS=https://<frontend-project>.vercel.app
+REQUEST_BODY_LIMIT=4mb
+```
+
+`PORT` is only needed for local development. Vercel invokes the exported Express application as a function. `crypto-portfolio-be/vercel.json` explicitly includes `data/**` so the sample CSV files are available at runtime.
+
+### 2. Deploy the frontend
+
+Create a second Vercel Project with:
+
+```text
+Root Directory: crypto-portfolio-fe
+Framework Preset: Next.js
+Build Command: npm run build
+```
+
+Set production environment variables before building:
+
+```env
+NEXT_PUBLIC_API_BASE_URL=https://<backend-project>.vercel.app
+NEXT_PUBLIC_SITE_URL=https://<frontend-project>.vercel.app
+```
+
+If Vercel assigns a different frontend hostname, update `CLIENT_URLS` in the backend project and redeploy it. Additional exact preview origins can be added as a comma-separated list.
+
+### 3. Verify production
+
+```bash
+curl https://<backend-project>.vercel.app/api/portfolio
+curl https://<backend-project>.vercel.app/api/v1/health
+```
+
+Then open the frontend URL and verify sample loading, a valid import, an invalid import, and reset. The application limits CSV files to 4 MB because Vercel Functions enforce a 4.5 MB request/response payload limit.
+
+The current in-memory store is suitable for an assessment demo but is not durable serverless persistence. Use Redis, Postgres, or another external store if imported datasets must remain available across cold starts, scaled instances, users, or deployments.
 
 ## Verification and engineering workflow
 
