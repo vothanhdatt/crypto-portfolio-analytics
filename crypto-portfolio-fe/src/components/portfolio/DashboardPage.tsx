@@ -136,8 +136,6 @@ export function DashboardPage() {
   if (state.status === "error") return <ErrorState message={state.message} retry={retryPortfolio} />;
 
   const portfolio = state.data;
-  if (portfolio.positions.length === 0) return <EmptyState priceAsOf={portfolio.priceAsOf} />;
-
   const cards = [
     {
       label: "Portfolio value",
@@ -204,20 +202,27 @@ export function DashboardPage() {
         ))}
       </section>
 
-      <PortfolioCharts positions={portfolio.positions} />
+      {portfolio.positions.length === 0 ? (
+        <EmptyState priceAsOf={portfolio.priceAsOf} />
+      ) : (
+        <>
+          <PortfolioCharts positions={portfolio.positions} />
 
-      <section className="panel holdings-panel" aria-labelledby="holdings-title">
-        <div className="panel-heading">
-          <div>
-            <p className="eyebrow">Asset breakdown</p>
-            <h2 id="holdings-title">Holdings</h2>
-          </div>
-          <div className="panel-meta">
-            <strong>{portfolio.positions.length}</strong> assets · <strong>{portfolio.transactionCount}</strong> trades
-          </div>
-        </div>
-        <HoldingsTable positions={portfolio.positions} />
-      </section>
+          <section className="panel holdings-panel" aria-labelledby="holdings-title">
+            <div className="panel-heading">
+              <div>
+                <p className="eyebrow">Asset breakdown</p>
+                <h2 id="holdings-title">Holdings</h2>
+              </div>
+              <div className="panel-meta">
+                <strong>{portfolio.positions.length}</strong> assets · <strong>{portfolio.transactionCount}</strong>{" "}
+                trades
+              </div>
+            </div>
+            <HoldingsTable positions={portfolio.positions} />
+          </section>
+        </>
+      )}
 
       <TransactionExplorer transactions={portfolio.transactions} />
     </div>
