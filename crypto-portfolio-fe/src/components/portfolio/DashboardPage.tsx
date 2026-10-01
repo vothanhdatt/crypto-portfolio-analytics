@@ -5,6 +5,7 @@ import { getPortfolioOverview } from "@/lib/api";
 import { formatPriceTimestamp } from "@/lib/format";
 import type { PortfolioSnapshot } from "@/types/portfolio";
 import { HoldingsTable } from "./HoldingsTable";
+import { ImportPanel } from "./ImportPanel";
 import { PortfolioCharts } from "./PortfolioCharts";
 import { SummaryCard } from "./SummaryCard";
 import { TransactionExplorer } from "./TransactionExplorer";
@@ -184,6 +185,11 @@ export function DashboardPage() {
           </div>
         </div>
       </section>
+
+      <ImportPanel
+        portfolio={portfolio}
+        onPortfolioChange={(snapshot) => setState({ status: "ready", data: snapshot, message: null })}
+      />
 
       <section className="summary-grid" aria-label="Portfolio summary">
         {cards.map((card) => (
