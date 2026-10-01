@@ -7,6 +7,7 @@ import type { PortfolioSnapshot } from "@/types/portfolio";
 import { HoldingsTable } from "./HoldingsTable";
 import { PortfolioCharts } from "./PortfolioCharts";
 import { SummaryCard } from "./SummaryCard";
+import { TransactionExplorer } from "./TransactionExplorer";
 
 type DashboardState =
   | { status: "loading"; data: null; message: null }
@@ -44,6 +45,12 @@ function LoadingDashboard() {
       <div className="panel skeleton-table">
         <span className="skeleton skeleton-title" />
         <span className="skeleton skeleton-row" />
+        <span className="skeleton skeleton-row" />
+        <span className="skeleton skeleton-row" />
+      </div>
+      <div className="panel skeleton-table skeleton-transaction-table">
+        <span className="skeleton skeleton-title" />
+        <span className="skeleton skeleton-copy" />
         <span className="skeleton skeleton-row" />
         <span className="skeleton skeleton-row" />
       </div>
@@ -198,6 +205,8 @@ export function DashboardPage() {
         </div>
         <HoldingsTable positions={portfolio.positions} />
       </section>
+
+      <TransactionExplorer transactions={portfolio.transactions} />
     </div>
   );
 }
