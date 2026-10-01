@@ -1,7 +1,13 @@
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const test = require('node:test');
 const Decimal = require('decimal.js');
+const { calculatePortfolio } = require('../src/domain/portfolio/portfolio.calculator');
+const { parsePriceCsv, parseTradeCsv } = require('../src/modules/import/import.parser');
 const { createDefaultStore } = require('../src/modules/portfolio/portfolio.store');
+
+const dataPath = (filename) => path.resolve(__dirname, '../data', filename);
 
 test('sample data reconciles to the assessment benchmark', () => {
   const portfolio = createDefaultStore().getSnapshot();
@@ -31,4 +37,16 @@ test('sample data reconciles to the assessment benchmark', () => {
 
   const allocation = portfolio.positions.reduce((total, position) => total.plus(position.allocation), new Decimal(0));
   assert.equal(allocation.toFixed(20), '1.00000000000000000000');
+});
+
+test('reversing every row in the sample trade CSV produces the same portfolio', () => {
+  const originalCsv = fs.readFileSync(dataPath('trades.csv'), 'utf8').trim();
+  const prices = parsePriceCsv(fs.readFileSync(dataPath('prices.csv')));
+  const [header, ...rows] = originalCsv.split(/\r?\n/);
+  const reversedCsv = [header, ...rows.reverse()].join('\n');
+
+  const original = calculatePortfolio({ trades: parseTradeCsv(originalCsv), prices });
+  const reversed = calculatePortfolio({ trades: parseTradeCsv(reversedCsv), prices });
+
+  assert.deepEqual(reversed, original);
 });

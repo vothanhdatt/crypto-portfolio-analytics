@@ -45,6 +45,22 @@ test('multiple BUYs use weighted-average cost and capitalize BUY fees', () => {
   assert.equal(position.totalFees, '12');
 });
 
+test('BUY fee is included in current cost basis', () => {
+  const position = positionFrom([
+    trade({
+      tradeId: 'T-1',
+      timestamp: '2026-01-01T00:00:00Z',
+      side: 'BUY',
+      quantity: '2',
+      priceUsd: '100',
+      feeUsd: '10',
+    }),
+  ]);
+
+  assert.equal(position.currentCostBasis, '210');
+  assert.equal(position.averageCost, '105');
+});
+
 test('partial SELL removes average cost and deducts SELL fees from realized P&L', () => {
   const position = positionFrom([
     trade({
@@ -78,6 +94,24 @@ test('partial SELL removes average cost and deducts SELL fees from realized P&L'
   assert.equal(position.averageCost, '114');
   assert.equal(position.realizedPnl, '31');
   assert.equal(position.totalFees, '17');
+});
+
+test('SELL fee is deducted from gross proceeds', () => {
+  const position = positionFrom([
+    trade({ tradeId: 'T-1', timestamp: '2026-01-01T00:00:00Z', side: 'BUY', quantity: '1', priceUsd: '100' }),
+    trade({
+      tradeId: 'T-2',
+      timestamp: '2026-01-02T00:00:00Z',
+      side: 'SELL',
+      quantity: '0.5',
+      priceUsd: '120',
+      feeUsd: '3',
+    }),
+  ]);
+
+  assert.equal(position.quantity, '0.5');
+  assert.equal(position.currentCostBasis, '50');
+  assert.equal(position.realizedPnl, '7');
 });
 
 test('full close resets cost basis before a later BUY', () => {

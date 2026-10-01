@@ -1,0 +1,12 @@
+{
+  "name": "crypto-portfolio-analytics",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "npm --prefix crypto-portfolio-be test"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}
+
