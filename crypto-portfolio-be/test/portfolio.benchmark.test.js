@@ -35,6 +35,13 @@ test('sample data reconciles to the assessment benchmark', () => {
   assert.equal(positions.SOL.quantity, '53.3643');
   assert.equal(rounded(positions.SOL.totalPnl), '-2715.66');
 
+  const reconcile = (field) =>
+    portfolio.positions.reduce((total, position) => total.plus(position[field]), new Decimal(0));
+
+  for (const field of ['currentValue', 'currentCostBasis', 'realizedPnl', 'unrealizedPnl', 'totalPnl', 'totalFees']) {
+    assert.equal(rounded(reconcile(field)), rounded(portfolio.summary[field]));
+  }
+
   const allocation = portfolio.positions.reduce((total, position) => total.plus(position.allocation), new Decimal(0));
   assert.equal(allocation.toFixed(20), '1.00000000000000000000');
 });

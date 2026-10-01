@@ -57,4 +57,4 @@ The suite covers weighted-average BUYs, BUY and SELL fees, partial and full clos
 
 ## Status
 
-The project includes a Decimal-based weighted-average calculation engine, complete CSV validation, atomic trade import/reset, typed frontend API contracts, and benchmark tests against the supplied 200 transactions. Dashboard visualization and the transaction explorer are the next implementation milestones.
+The project includes a Decimal-based weighted-average calculation engine, complete CSV validation, atomic trade import/reset, typed frontend API contracts, and benchmark tests against the supplied 200 transactions. The responsive portfolio dashboard now presents six reconciled summary metrics, valuation time, accessible gain/loss signals, and the calculated holdings breakdown. Import controls, charts, and the transaction explorer are the next implementation milestones.
