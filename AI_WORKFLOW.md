@@ -1,156 +1,173 @@
-# AI Workflow
+# AI-Assisted Development Workflow
 
-This document records eight representative uses of AI during the project. AI output was treated as a proposal: code and recommendations were reviewed against the assessment, repository boundaries, automated tests, security checks, and production behavior before acceptance.
+This document explains how I used AI as a development assistant during the assessment. Before asking AI to do any work, I read the assessment and reviewed the supplied CSV files myself. I first formed my own understanding of the expected behavior, scope, and acceptance criteria. I then used AI to cross-check that understanding, clarify uncertain points, and identify edge cases I might have missed.
 
-## Tools, model, contribution, and ownership
+Implementation was divided into small, reviewable stages. After each stage, I inspected the generated code, compared it with the assessment, ran the relevant tests or build checks, and requested corrections when the result did not meet the intended design. I did not ask AI to generate the entire application in one step, and I did not treat generated output as correct without verification.
 
-- **Agent and model:** OpenAI Codex using a GPT-5 model provided by the Codex environment.
-- **Tools:** Codex file editing and shell tools, Git, npm scripts, Node.js tests, TypeScript, ESLint, npm audit, PDF/CSV inspection, and local browser automation with Chrome.
-- **AI contribution:** The agent produced most of the initial application code, automated tests, and project documentation in response to the prompts below. It also proposed refactors and performed repeatable verification commands.
-- **Human contribution:** I defined the requirements and acceptance criteria, selected the architecture, reviewed formulas and dependency boundaries, rejected or revised incorrect output, and decided which changes to retain.
-- **Ownership:** I take responsibility for all submitted code and documentation and can explain, test, and modify the implementation during review.
+## Tools, contribution, and ownership
 
-## 1. Requirement analysis and benchmark definition
+- **AI assistant:** OpenAI Codex with a GPT-5 model provided by the Codex environment.
+- **Supporting tools:** Git, npm scripts, Node.js tests, TypeScript, ESLint, npm audit, PDF/CSV inspection, and browser-based UI checks.
+- **My contribution:** I read and interpreted the assessment, defined the implementation order and acceptance criteria, selected the final architecture, reviewed the financial formulas, checked generated code and tests, rejected unsuitable results, and decided which changes to keep.
+- **AI contribution:** AI helped analyze my interpretation of the requirements, propose implementation details, generate code and tests for individual stages, investigate failures, and update documentation.
+- **Ownership:** I take responsibility for all submitted code and documentation. I can explain, test, debug, and modify the implementation without relying on the AI conversation history.
+
+## Working method
+
+For each part of the assessment, I followed this cycle:
+
+1. Read the relevant requirement and determine the expected result myself.
+2. Ask AI to restate or analyze it so I could compare its interpretation with mine.
+3. Clarify assumptions and reject anything outside the assessment scope.
+4. Ask AI to implement one bounded stage.
+5. Review the files and logic produced in that stage.
+6. Run targeted tests, linting, type checks, builds, or browser checks.
+7. Fix or reject the output before moving to the next stage.
+
+The following examples show how this process was applied.
+
+## 1. Cross-checking my understanding of the assessment
 
 **Category:** Requirement analysis
 
-**Goal and context:** Understand the five-page assessment and supplied CSV datasets, identify the required product scope, and establish known numeric results before implementation.
+**My understanding before using AI:** After reading the assessment and inspecting `trades.csv` and `prices.csv`, I understood that the required product was a portfolio analytics application based on weighted-average cost basis. It needed a backend calculation boundary, CSV import and validation, a dashboard, charts, a transaction explorer, automated tests, documentation, and a deployed application. I also understood that authentication, a database, blockchain integration, and live market-price fetching were not required.
 
-**Prompt:**
+**What I asked AI:**
 
-> Phân tích yêu cầu này và liệt kê các bước để hoàn thành.
+> Tôi đã đọc và nắm các yêu cầu chính của đề bài cùng các file dữ liệu được cung cấp. Hãy phân tích lại yêu cầu, liệt kê các đầu việc, các trường hợp biên và đề xuất thứ tự triển khai để tôi đối chiếu với cách hiểu của mình. Đồng thời làm rõ những điểm còn có thể gây nhầm lẫn.
 
-The context included `assessment.pdf`, `trades.csv`, and `prices.csv`.
+**AI response:** AI grouped the work into CSV validation, weighted-average calculation, API endpoints, dashboard, charts, transaction explorer, import/reset behavior, testing, accessibility, documentation, and deployment. It also highlighted ambiguous points such as fee treatment, transaction ordering, short positions, missing prices, and failed-import behavior.
 
-**Agent response:** The agent decomposed the work into data validation, a weighted-average calculation engine, an API boundary, dashboard, charts, transaction explorer, import workflow, testing, and production QA. It also calculated expected sample totals before implementation.
+**My verification and decision:** I compared every proposed item with the PDF and removed ideas that were not part of the assessment. I decided that the calculation engine and its tests had to be completed before UI work. I also required benchmark values from the supplied dataset so later API and UI results could be reconciled.
 
-**My review:** I checked the proposed scope against the assessment. Authentication, a database, blockchain integrations, and live price fetching were excluded because they were not required. Tests were moved ahead of UI work so the financial baseline existed first.
+**Outcome:** The analysis was accepted only as a cross-check of my original reading. It became the implementation checklist, with financial logic and tests scheduled first.
 
-**Outcome:** Accepted as the implementation sequence. The sample expectations were later encoded in `portfolio.benchmark.test.js`, including 200 transactions, portfolio totals, per-asset quantities, and allocation reconciliation.
-
-## 2. Project structure and Git workflow
+## 2. Defining the project structure and Git workflow
 
 **Category:** Architecture decision
 
-**Goal and context:** Initialize maintainable backend and frontend applications using useful conventions from the Bot Farm references while keeping unrelated business logic and secrets out of the assessment repository.
+**My understanding before using AI:** I wanted separate backend and frontend applications, similar in organization to the Bot Farm projects, while avoiding copied business logic or unnecessary infrastructure. I also wanted each feature or issue developed on its own branch instead of directly on `main` or `dev`.
 
-**Prompt:**
+**What I asked AI:**
 
-> Khởi tạo dự án với cấu trúc thư mục tương tự bot-farm BE và FE. Mỗi chức năng hoặc issue phải dùng branch riêng.
+> Tiến hành khởi tạo dự án backend và frontend với cấu trúc thư mục tương tự dự án Bot Farm BE và FE. Mỗi chức năng hoặc issue phải được thực hiện trên một branch riêng. Bổ sung tài liệu về quy tắc đặt tên branch và commit.
 
-**Agent response:** The agent scaffolded separate Express and Next.js applications and mirrored the useful route/controller/service and feature-component organization of the reference projects.
+**AI response:** AI proposed an Express backend organized by route, controller, service, middleware, and domain responsibilities, plus a Next.js frontend organized by application and feature components. It also drafted the Git conventions.
 
-**My review:** I verified that reference business logic and secrets were not copied. The team conventions were recorded in `CONTRIBUTING.md`: English lowercase branch names, hyphen-separated descriptions, and conventional commit prefixes. Work proceeded on `feature/*`, `fix/*`, `refactor/*`, or `docs/*` branches rather than directly on `main` or `develop`.
+**My verification and decision:** I reviewed the generated folders and dependencies before accepting them. I confirmed that no secrets or unrelated Bot Farm code had been copied. I kept the two-application repository because it was sufficient for the assessment and rejected adding an unnecessary monorepo framework.
 
-**Outcome:** Accepted. The repository remains a lightweight two-application monorepo without an unnecessary workspace framework.
+**Outcome:** The initial structure and Git rules were accepted. The conventions are recorded in `CONTRIBUTING.md`, and later work was split across `feature/*`, `fix/*`, `refactor/*`, and `docs/*` branches.
 
-## 3. Calculator boundary was rejected and refactored
+## 3. Rejecting the first calculator boundary
 
 **Category:** Architecture correction — AI result rejected
 
-**Goal and context:** Keep financial rules deterministic and framework-independent so they can be tested without HTTP, UI, or storage dependencies.
+**My understanding before using AI:** The calculator had to be a pure domain module. It should receive plain trade and price data, return calculated results, and remain independent from Express, HTTP errors, UI code, and database/storage code.
 
-**Prompt:**
+**What I asked AI:**
 
-> Viết calculation engine tách thành module thuần, không phụ thuộc UI hay database.
+> Viết calculation engine theo phương pháp weighted-average thành một domain module thuần, không phụ thuộc vào UI, database, Express hoặc HTTP error.
 
-**Agent response:** The first generated calculator was placed under `src/modules/portfolio` and raised the shared HTTP/application `AppError`. Although it had no UI or database dependency, its location and error type still coupled financial rules to the application layer.
+**AI response:** The first version was placed under `src/modules/portfolio` and threw the application's shared `AppError`. The calculations worked, but the domain rules still depended on an application/HTTP-oriented error type.
 
-**My review:** I rejected this result because it did not satisfy the requested pure domain boundary. The calculation code needed to accept plain data, return plain data, and report domain errors without knowing about Express or HTTP status codes.
+**My verification and decision:** I inspected the imports rather than judging purity from the filename alone. Because the calculator depended on `AppError`, it did not satisfy the domain boundary I had defined. I rejected that structure and asked AI to move the logic into a dedicated domain module with its own domain error.
 
-**Correction:** Commit `2795a9e` moved the calculator from `src/modules/portfolio/portfolio.calculator.js` to `src/domain/portfolio/portfolio.calculator.js` and introduced `PortfolioCalculationError`. `portfolio.store.js` now translates domain errors to application `AppError` instances at the boundary.
+**Correction:** The calculator was moved to `src/domain/portfolio/portfolio.calculator.js` and now uses `PortfolioCalculationError`. The store/application layer translates domain failures into API-facing `AppError` instances.
 
-**Outcome:** Accepted after refactoring. The domain engine depends only on `decimal.js` and its own error type; routes, controllers, storage, and frontend code remain outside it.
+**Outcome:** I accepted the revised version only after confirming that the domain calculator depended on `decimal.js` and its own domain code, not on routes, controllers, storage, or frontend modules.
 
-## 4. PostCSS dependency recommendation was rejected
+## 4. Implementing and checking the financial rules
 
-**Category:** Dependency/security review — AI result rejected
+**Category:** Incremental implementation
 
-**Goal and context:** Verify that frontend build dependencies were maintained and that generated version recommendations did not introduce a known vulnerable or obsolete package release.
+**My understanding before using AI:** From the assessment, I determined that BUY fees must increase cost basis, SELL fees must reduce proceeds, partial sales must use the weighted-average unit cost immediately before the sale, full closes must clear the remaining basis, and any sale greater than the available quantity must be rejected.
 
-**Prompt:**
+**What I asked AI:**
 
-> Kiểm tra dependency và production build trước khi hoàn tất.
+> Triển khai calculation engine weighted-average và bộ validation CSV đầy đủ. Cần xử lý nhiều lệnh BUY với giá khác nhau, BUY fee được đưa vào cost basis, partial SELL, SELL fee được trừ khỏi proceeds, full close rồi BUY lại, từ chối short position, duplicate hoặc invalid CSV row và missing price.
 
-**Agent response:** An AI-generated dependency recommendation suggested pinning an older PostCSS release. The proposal presented the version change as a suitable compatibility fix.
+**AI response:** AI implemented Decimal-based processing, deterministic ordering by timestamp and trade ID, CSV schema/value validation, duplicate detection, missing-price checks, and structured validation errors.
 
-**My review:** I rejected the suggested version after dependency review identified it as outdated and potentially exposed to known PostCSS security issues. I inspected the installed dependency graph and lockfile instead of relying on the generated recommendation. The frontend declares `postcss` as `^8.5.3`; the current lock resolves the direct dependency to `8.5.28`, while Next.js carries its own compatible nested release.
+**My verification and decision:** I manually reviewed the BUY and SELL equations and followed representative trades through the code. I checked that a failed calculation occurred before the current snapshot was replaced. I also verified that a fully closed position did not retain an insignificant residual cost basis.
 
-**Correction:** The maintained 8.5.x dependency line was retained, dependencies were resolved through the lockfile, and frontend lint, type checking, and the production build were rerun.
+**Outcome:** The implementation was accepted after the formulas and mutation order matched my expected behavior. Invalid imports do not replace the last valid dataset.
 
-**Outcome:** Accepted only after local dependency resolution and build verification. This example is why version or vulnerability claims from AI must be verified against the actual manifest, lockfile, and package audit rather than copied directly.
-
-## 5. Weighted-average engine, validation, and atomic import
-
-**Category:** Implementation
-
-**Goal and context:** Implement all financial rules and CSV validations behind an atomic import boundary, using the supplied prices as the only valuation source.
-
-**Prompt:**
-
-> Triển khai calculation engine weighted-average và bộ validation CSV đầy đủ. BUY fee vào cost basis, SELL fee trừ proceeds, cấm short position, và import lỗi không được thay dataset cũ.
-
-**Agent response:** The agent implemented Decimal-based BUY/SELL processing, deterministic timestamp/trade-ID ordering, structured CSV errors, duplicate detection, required-column validation, supported value checks, price validation, and an in-memory store.
-
-**My review:** I reviewed the implementation for fee handling and mutation order. I required the store to parse and calculate a candidate snapshot before assigning `currentTrades` or `snapshot`; this guarantees that parse, validation, missing-price, or short-position errors cannot replace the last valid dataset.
-
-**Outcome:** Accepted. BUY fees are capitalized, SELL fees reduce net proceeds, full closes clear residual open basis, reopening is supported, and invalid imports are atomic.
-
-## 6. Tests-first calculation and reconciliation debugging
-
-**Category:** Testing and debugging — AI test corrected
-
-**Goal and context:** Establish automated numeric evidence before UI development and expose the entire suite through one documented root command.
-
-**Prompt:**
-
-> Viết test trước khi làm UI và cho phép chạy toàn bộ test bằng một command.
-
-**Agent response:** The agent generated tests for multiple BUY prices, BUY and SELL fees, partial and full closes, reopening, short rejection, duplicate/invalid rows, the full sample benchmark, reversed CSV order, missing prices, failed-import preservation, and allocation totals.
-
-**My review:** I found that one generated reconciliation assertion compared long raw Decimal strings as if separately accumulated values must serialize identically. The calculation context can produce equivalent display currency totals with different insignificant tails depending on division history, so that test overstated the UI contract.
-
-**Correction:** Financial behavior and exact invariants remain exact where required, while dashboard reconciliation compares currency at its documented two-decimal display precision using Decimal `ROUND_HALF_UP`. Allocation is still checked to 20 decimal places and equals `1.00000000000000000000` for the sample.
-
-**Outcome:** Accepted after the assertion was corrected to test the intended contract. `npm test` runs the entire backend suite from the repository root.
-
-## 7. API, dashboard, charts, and transaction explorer
-
-**Category:** Implementation and boundary review
-
-**Goal and context:** Build the required API and product surfaces without duplicating financial calculation logic in React components.
-
-**Prompt:**
-
-> Xây API/backend boundary, dashboard, biểu đồ và transaction explorer. Frontend không được tự tính số liệu tài chính; filter chỉ thay đổi bảng transaction.
-
-**Agent response:** The agent added `GET /api/portfolio`, `POST /api/import`, and `POST /api/reset`, then built six summary cards, holdings, allocation and P&L charts, and the filterable transaction table over the typed snapshot.
-
-**My review:** I inspected the frontend client and components for duplicated cost-basis or P&L formulas. Chart number conversions were permitted only for SVG geometry and presentation. Transaction filter state was kept inside the explorer and never sent back to the portfolio calculator.
-
-**Outcome:** Accepted. Headline values, holdings, and charts share one backend snapshot. Search, exchange/side/date filters, timestamp sorting, and pagination affect only visible transaction rows.
-
-## 8. Import, accessibility, and production QA
+## 5. Writing tests before building the UI
 
 **Category:** Testing and debugging
 
-**Goal and context:** Make dataset replacement understandable and recoverable, then verify the completed UI against keyboard, semantic, contrast, responsive, console, and production-build expectations.
+**My understanding before using AI:** The financial engine was the highest-risk part of the assessment, so its behavior needed executable evidence before any dashboard components were built. One root command also needed to run the complete automated suite.
 
-**Prompt:**
+**What I asked AI:**
 
-> Hoàn thiện import UI, accessibility và production QA. Giữ dashboard cũ nếu import lỗi; kiểm tra keyboard, labels, table semantics, contrast, mobile overflow, console và build.
+> Viết test trước khi làm UI. Các test cần bao phủ nhiều BUY với mức giá khác nhau, BUY/SELL fee, partial và full close, BUY lại sau khi đóng vị thế, từ chối short position, duplicate hoặc invalid CSV row, benchmark của toàn bộ sample dataset, CSV đảo thứ tự, missing price, import thất bại không thay dataset cũ và tổng allocation xấp xỉ 100%. Cần có một command duy nhất để chạy toàn bộ test.
 
-**Agent response:** The agent added drag-and-drop/file selection, file metadata, structured row errors, success/reset feedback, and live-region states, then exercised the production UI at desktop and mobile sizes.
+**AI response:** AI generated unit, validation, import, and benchmark tests and exposed them through the root `npm test` command.
 
-**My review:** I used QA results to identify issues that a source-only review had missed, including a failed favicon request and text contrast near the threshold. Those results were not waived: the icon asset and color tokens were corrected, loading/error announcements were verified in the accessibility tree, and the browser console and production build were checked again.
+**My verification and decision:** I reviewed each test to ensure it asserted business behavior instead of merely reproducing the implementation. I ran the full sample dataset and compared portfolio totals, asset quantities, transaction count, and allocation reconciliation. I also tested reversed input ordering to confirm deterministic results.
 
-**Outcome:** Accepted after correction. Invalid CSV upload leaves all six current dashboard metrics unchanged; valid upload replaces the snapshot; reset restores the 200-row sample. Final keyboard, semantic table, contrast, overflow, live-region, console, and build evidence is recorded in `ACCESSIBILITY_QA.md`.
+**Correction:** One generated test compared long raw Decimal strings even though the UI contract displays currency to two decimal places. I rejected that assertion because harmless division tails could make equivalent display totals serialize differently. I changed the reconciliation check to use the documented `ROUND_HALF_UP` currency precision while keeping exact checks where exactness was required.
 
-## Review principles used throughout
+**Outcome:** UI development started only after the engine and validation suite passed. The complete backend suite can be run with one command: `npm test` from the repository root.
 
-- AI output is never accepted solely because it compiles or looks plausible.
-- Financial formulas are checked against hand-derived examples and fixed sample benchmarks.
-- Architectural requirements are verified from dependency direction, not only filenames.
-- Dependency advice is checked against the installed graph, lockfile, security tooling, and a clean build.
-- A failing or overly strict generated test is corrected to the product contract; production code is not distorted merely to satisfy a flawed assertion.
-- Browser and accessibility findings must be reproduced and rechecked after a fix.
+## 6. Building the API before connecting the frontend
+
+**Category:** Boundary implementation
+
+**My understanding before using AI:** The frontend should display already-calculated, validated data. It should not recalculate cost basis, realized P&L, unrealized P&L, or portfolio totals. The backend therefore needed to own sample loading, parsing, validation, calculation, import, and reset behavior.
+
+**What I asked AI:**
+
+> Xây API/backend boundary gồm `GET /api/portfolio`, `POST /api/import` và `POST /api/reset`. Backend chịu trách nhiệm đọc sample data, parse và validate file import, chạy calculation engine và trả về kết quả typed. Không để frontend tự tính số liệu tài chính.
+
+**AI response:** AI added the API routes and a typed frontend client, then connected the dashboard to a single backend snapshot.
+
+**My verification and decision:** I inspected frontend code for duplicated financial formulas. Converting numeric strings to numbers for chart geometry was acceptable, but recomputing portfolio figures in React was not. I also verified the API success and error shapes and checked that import/reset returned complete recalculated snapshots.
+
+**Outcome:** The boundary was accepted. Summary cards, holdings, charts, and transactions consume the same backend result, so the displayed metrics can be reconciled.
+
+## 7. Adding UI features one stage at a time
+
+**Category:** Incremental UI implementation
+
+**My understanding before using AI:** I divided the UI into four separate stages: dashboard summary and holdings, charts, transaction explorer, and import/reset. Transaction filters had to affect only the table and never the portfolio calculation.
+
+**What I asked AI:**
+
+> Triển khai UI theo từng bước. Trước tiên làm sáu summary cards và holdings table. Sau khi kiểm tra xong thì thêm biểu đồ allocation và P&L. Tiếp theo xây transaction explorer với filter, sorting và pagination. Cuối cùng hoàn thiện CSV import, validation errors theo dòng, success message và reset về sample data.
+
+**AI response:** AI implemented each stage in sequence, including timestamp display, loading/error/empty states, responsive tables, accessible P&L labels, mobile-friendly chart legends/tooltips, transaction filters, drag-and-drop upload, and reset feedback.
+
+**My verification and decision:** After each stage, I compared the visible values with the API snapshot and the sample benchmark. I tested positive and negative P&L, zero allocations, mobile overflow, filtering, sorting, pagination, valid imports, invalid imports, and reset. I specifically confirmed that changing transaction filters did not issue a new portfolio calculation or change summary metrics.
+
+**Outcome:** Each UI stage was retained only after it worked against the existing backend contract. A failed import leaves the current dashboard unchanged, while a successful import replaces the visible snapshot.
+
+## 8. Rejecting unsafe dependency advice and completing QA
+
+**Category:** Production QA — AI result rejected
+
+**My understanding before using AI:** Before submission, the project needed accessible interaction, no browser console errors, passing lint/type/tests, a successful production build, and dependencies checked against the actual lockfile. Version recommendations from AI were not sufficient evidence.
+
+**What I asked AI:**
+
+> Kiểm tra lại accessibility, runtime behavior, dependencies, toàn bộ test và production build. Hãy báo cáo các lỗi tìm thấy, nhưng không được kết luận một phiên bản package là an toàn nếu chưa kiểm tra dependency graph, manifest, lockfile và audit result thực tế.
+
+**AI response:** AI helped identify UI issues such as a missing favicon and borderline text contrast. It also initially suggested pinning an older PostCSS version as a compatibility fix.
+
+**My verification and decision:** I verified browser findings at desktop and mobile sizes and inspected keyboard navigation, labels, semantic tables, live regions, overflow, and console output. I rejected the PostCSS suggestion after checking the manifest, lockfile, and audit information because the proposed release was outdated and potentially affected by known security issues.
+
+**Correction:** I retained the maintained PostCSS 8.5.x line, used the resolved lockfile dependency, fixed the favicon and contrast issues, and reran tests, linting, type checking, dependency audit, browser checks, and the production build.
+
+**Outcome:** The final result was accepted only after the checks passed. The detailed accessibility and production QA evidence is recorded in `ACCESSIBILITY_QA.md`.
+
+## Review principles applied throughout
+
+- I established my own interpretation of the requirement before prompting AI.
+- I used AI to challenge or clarify that interpretation, not to replace reading the assessment.
+- I divided the work into bounded stages and reviewed each stage before requesting the next one.
+- I checked financial formulas with small manual examples and fixed sample benchmarks.
+- I judged architecture by dependency direction, not only by folder or file names.
+- I checked generated tests against the intended product contract.
+- I verified dependency advice against the manifest, lockfile, audit results, and a production build.
+- I reproduced browser and accessibility issues and reran checks after every correction.
+- I rejected or revised AI output whenever it conflicted with the assessment, the architecture, security expectations, or verified application behavior.
